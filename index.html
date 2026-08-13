@@ -171,6 +171,19 @@ main{
 }
 .dropzone .title{font-weight:700; font-size:15.5px; color:var(--navy); margin-bottom:4px;}
 .dropzone .desc{color:var(--text-muted); font-size:13px;}
+.sample-link{
+  color:var(--text-muted);
+  font-size:13px;
+  text-align:center;
+  max-width:560px;
+  margin:0;
+}
+.sample-link a{
+  color:var(--accent-dark);
+  font-weight:700;
+  text-decoration:none;
+}
+.sample-link a:hover{text-decoration:underline;}
 input[type=file]{display:none;}
 
 /* ---------- Config panel ---------- */
@@ -684,6 +697,7 @@ svg.chart{width:100%; height:auto; display:block;}
       <div class="desc">Works with any number of columns &mdash; you'll confirm which ones are data vs. metadata in the next step.</div>
       <input type="file" id="fileInput" accept=".csv,text/csv">
     </div>
+    <p class="sample-link">Don't have a file handy? <a href="http://moe-sg.github.io/SPCDetective/Sample_QC_Manufacturing_Data.csv" target="_blank" rel="noopener">Download sample data</a> to try the tool &mdash; a synthetic 150-record manufacturing/QC dataset with known outliers and pattern violations already built in.</p>
   </section>
 
   <!-- CONFIG PANEL -->

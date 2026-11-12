@@ -992,6 +992,7 @@ svg.chart{width:100%; height:auto; display:block;}
           <div class="desc">Checked against your existing baseline's control limits &mdash; nothing here changes the baseline itself. Accepts .csv, .xlsx, .xlsm.</div>
         </div>
         <input type="file" id="verifyFileInput" accept=".csv,text/csv,.xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12" style="display:none;">
+        <p class="sample-link" style="margin-top:12px;">No new file handy? <button type="button" class="btn btn-secondary" id="btnLoadVerifySample" style="margin-left:6px;">Load sample data</button> &mdash; a small 10-record new batch with a few out-of-range values, to see how verification works.</p>
       </div>
 
       <div id="verifyConfigArea" class="hidden">
@@ -1978,6 +1979,13 @@ function updateVerifyGate() {
     `${monitored} monitored parameter${monitored === 1 ? '' : 's'}. The baseline's own control limits stay exactly as they are \u2014 loading a file here never adds to or recalculates them.`;
 }
 
+/* Embedded small "new batch" (10 records, same columns as the sample baseline, a few values deliberately out of range) for the Verify tab's "Load sample" button. */
+const SAMPLE_VERIFY_CSV_TEXT = "Batch_ID,Machine_ID,Operator,Shift,Test_DateTime,Chamber_Temp_C,Chamber_Pressure_PSI,Spindle_Speed_RPM,Motor_Torque_Nm,Vibration_mmps,Coolant_Flow_Lpm,Input_Voltage_V,Input_Current_A,Output_Power_kW,Ambient_Temp_C,Ambient_Humidity_pct,Cycle_Time_s,Fill_Weight_g,Seal_Strength_N,Thickness_mm,Diameter_mm,Hardness_HRC,Surface_Roughness_Ra,Noise_Level_dB,Leak_Rate_sccm,Bearing_Temp_C,Hydraulic_Pressure_Bar,Gain_Setting,Filter_Mode,Calibration_Level,Recipe_Code,Tool_Head_Index,Program_Step,Standby_Sensor_Backup_V\nBATCH-2000,M-01,L.Tan,Day,2026-02-01 06:00,186.6,41.803,3053.3,12.735,2.293,15.619,231.0,8.434,1.980,22.665,45.285,34.926,502.7,55.863,2.089,25.377,57.945,0.789,67.800,0.486,54.074,123.2,2,1,3,1,4,2,3.379\nBATCH-2001,M-02,A.Kumar,Day,2026-02-02 06:00,186.3,41.037,2987.5,12.343,2.011,14.875,230.0,8.852,1.981,20.966,43.344,33.275,500.0,55.355,2.018,25.437,57.853,0.799,68.841,0.501,53.249,119.0,2,1,3,1,4,2,3.512\nBATCH-2002,M-01,L.Tan,Day,2026-02-03 06:00,184.8,41.349,3017.3,12.412,1.818,15.670,231.1,8.765,2.027,22.503,45.425,33.231,501.4,53.890,2.037,25.340,57.474,0.770,69.601,0.366,51.886,120.6,2,1,3,1,4,2,3.619\nBATCH-2003,M-02,L.Tan,Day,2026-02-04 06:00,186.0,41.903,3030.5,12.389,2.055,14.871,238.9,8.593,1.923,22.220,43.418,34.100,502.2,55.524,2.041,25.343,58.450,0.875,66.690,0.530,52.985,117.9,2,1,3,1,4,2,3.308\nBATCH-2004,M-01,L.Tan,Day,2026-02-05 06:00,185.9,41.961,3012.4,12.785,2.112,15.849,229.5,8.423,1.993,22.189,42.301,34.716,503.3,54.195,2.009,25.392,58.060,0.783,69.735,0.430,55.409,116.7,3,1,3,1,4,2,2.901\nBATCH-2005,M-02,A.Kumar,Day,2026-02-06 06:00,186.1,41.177,3006.5,12.997,2.588,14.950,230.5,8.433,1.879,21.102,43.473,34.956,498.9,56.135,2.059,25.352,58.878,0.871,67.684,0.465,53.879,112.9,2,1,3,1,4,2,3.221\nBATCH-2006,M-01,L.Tan,Night,2026-02-07 06:00,184.2,42.138,3023.9,12.732,2.057,16.258,230.4,8.574,2.004,21.815,47.419,34.750,502.7,55.386,2.108,25.386,57.982,0.759,67.650,0.525,53.995,116.8,2,1,3,1,4,2,3.206\nBATCH-2007,M-02,A.Kumar,Night,2026-02-08 06:00,183.4,40.874,2970.6,12.462,1.968,15.241,231.4,8.583,1.848,20.646,45.282,35.257,499.6,53.827,2.271,25.365,57.763,0.831,66.393,0.395,56.622,121.0,2,1,3,1,4,2,3.227\nBATCH-2008,M-01,L.Tan,Night,2026-02-09 06:00,185.4,35.981,2959.9,11.652,2.203,14.660,229.1,8.158,2.012,22.863,49.657,33.470,499.9,52.924,2.073,25.472,57.530,0.885,69.254,0.485,51.219,123.6,2,1,3,1,4,2,3.123\nBATCH-2009,M-02,A.Kumar,Night,2026-02-010 06:00,183.9,43.307,3009.7,11.696,2.148,14.623,229.3,7.944,1.935,22.822,48.324,35.265,500.5,54.881,2.037,25.398,57.775,0.835,68.052,0.507,53.555,120.7,2,1,3,1,4,2,3.523\n";
+
+function loadSampleVerifyData() {
+  handleVerifyFile(new File([SAMPLE_VERIFY_CSV_TEXT], 'Sample_New_Batch.csv', { type: 'text/csv' }));
+}
+
 function handleVerifyFile(file) {
   if (!file) return;
   if (!hasBaseline()) { showToast('Process a baseline dataset first.', true); return; }
@@ -2232,6 +2240,8 @@ function resetVerifyTab() {
 }
 
 function initVerifyTab() {
+  const verifySampleBtn = $('btnLoadVerifySample');
+  if (verifySampleBtn) verifySampleBtn.addEventListener('click', (e) => { e.stopPropagation(); loadSampleVerifyData(); });
   const dropzone = $('verifyDropzone');
   const fileInput = $('verifyFileInput');
   dropzone.addEventListener('click', () => fileInput.click());
